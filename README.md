@@ -1,36 +1,156 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BookingApp - Frontend
 
-## Getting Started
+Booking system with Google Calendar integration.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Auth0 Authentication** - Secure login with Google support
+- **Booking Management** - Create, view, and cancel bookings
+- **Google Calendar Integration** - Conflict checking with existing events
+- **Conflict Detection** - Prevents duplicate bookings in the system and Google Calendar
+- **Modern UI** - Built with Tailwind CSS and shadcn/ui components
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Styling:** Tailwind CSS 4
+- **Authentication:** Auth0
+- **Components:** shadcn/ui, Radix UI
+- **Notifications:** Sonner
+
+## 📋 Prerequisites
+
+- Node.js 20+
+- pnpm 9+
+- Backend API running 
+- Auth0 account configured
+
+## ⚙️ Environment Variables
+
+Create a `.env.local` file in the project root:
+
+```env
+# Auth0
+AUTH0_SECRET=your-secret-at-least-32-characters
+AUTH0_BASE_URL=http://localhost:3000
+AUTH0_ISSUER_BASE_URL=https://your-tenant.auth0.com
+AUTH0_CLIENT_ID=your-client-id
+AUTH0_CLIENT_SECRET=your-client-secret
+AUTH0_AUDIENCE=your-api-audience
+
+# Backend API
+NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Clone the repository
+git clone https://github.com/your-username/booking-frontend.git
+cd booking-frontend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Install dependencies
+pnpm install
 
-## Learn More
+# Run in development mode
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+The application will be available at `http://localhost:3000`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🐳 Docker
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Build and run with Docker Compose
 
-## Deploy on Vercel
+```bash
+# Create environment variables file
+cp .env.example .env
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Build and run
+docker compose up --build
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Run in background
+docker compose up -d --build
+```
+
+### Manual build
+
+```bash
+docker build -t booking-frontend --build-arg NEXT_PUBLIC_API_URL=http://localhost:8080 .
+docker run -p 3000:3000 --env-file .env booking-frontend
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── dashboard/          # Main dashboard page
+│   ├── auth/               # Auth routes (handled by Auth0)
+│   ├── globals.css         # Global styles
+│   ├── layout.tsx          # Root layout
+│   └── page.tsx            # Landing page
+├── components/
+│   ├── blocks/             # Business components
+│   │   ├── booking-form.tsx
+│   │   ├── calendar-card.tsx
+│   │   └── dashboard-client.tsx
+│   └── ui/                 # UI components (shadcn)
+├── lib/
+│   ├── api/
+│   │   └── client.ts       # API client
+│   └── utils.ts            # Utilities
+├── services/
+│   └── auth0.ts            # Auth0 configuration
+├── types.ts                # TypeScript types
+└── middleware.ts           # Authentication middleware
+```
+
+## 🔗 API Endpoints (Backend)
+
+The frontend consumes the following endpoints:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/auth/me` | Get user profile |
+| GET | `/auth/google/connect` | URL to connect Google Calendar |
+| POST | `/auth/google/disconnect` | Disconnect Google Calendar |
+| GET | `/bookings` | List user bookings |
+| POST | `/bookings` | Create new booking |
+| DELETE | `/bookings/:id` | Delete booking |
+| GET | `/bookings/slots?date=` | Get available slots |
+
+## 🔐 Auth0 Configuration
+
+1. Create a **Regular Web Application** in Auth0
+2. Configure allowed URLs:
+   - **Allowed Callback URLs:** `http://localhost:3000/auth/callback`
+   - **Allowed Logout URLs:** `http://localhost:3000`
+3. Create an API in Auth0 and get the `audience`
+4. Enable Google connection in Authentication > Social
+
+## 📱 Features Overview
+
+### Landing Page
+- System information
+- Login with Google button
+
+### Dashboard
+- **Google Calendar Connection:** Connect/disconnect Google account for conflict checking
+- **Bookings List:** View all bookings sorted by date
+- **Create Booking:** Modal with form for new booking (name, date, start/end time)
+- **Delete Booking:** Button to cancel existing bookings
+
+### Conflict Detection
+When creating a booking, the system checks:
+1. No overlapping bookings exist in the system
+2. No overlapping events exist in Google Calendar (if connected)
+
+## 🧪 Available Scripts
+
+```bash
+pnpm dev      # Development server
+pnpm build    # Production build
+pnpm start    # Start production server
+```
+
